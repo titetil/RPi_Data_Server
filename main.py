@@ -1,5 +1,5 @@
 import os
-import time
+import datetime
 from os import walk
 import shutil
 import errno
@@ -41,9 +41,9 @@ def sync_file(file_rel_path):
     else:
         #This is the first data file, so just copy it to Data dirctory
         shutil.copyfile(sync_file_path, data_file_path)
-    create_rel_time(data_file_path)
-    #Create PDF plots
+    #Create relative time column, then create PDF plots
     if data_file_path.split("_")[1] == 'RPM.csv':
+        create_rel_time(data_file_path)
         pump_plot.plot_layout(data_file_path, [7, 8, 10, 12, 13, 15])
     #File has either been concat with existing file, or copied. Now delete.
     os.remove(sync_file_path)
@@ -59,14 +59,18 @@ def create_rel_time(path):
     inc = 0.1 #this represent 0.1 S/s or 6 samples per hour
     data = np.genfromtxt(path, delimiter=',', dtype=str)
     size = data.shape[0] - 2 #subtract 2 because of header/units
-    time = np.arange(0, size*inc, inc)
+    print path
+    time = np.linspace(0, (size-1)*inc, num=size)
     data[2:,0] = time
     np.savetxt(path, data, delimiter=',', fmt='%s')
 
-
+print 'starting'
+print datetime.datetime.now()
 copy_sync_folders()
 rel_paths = get_rel_file_paths()
 for path in rel_paths:
     sync_file(path)
+
+#create_rel_time(r'C:\Users\gtetil\Downloads\5600_RPM.csv')
 
 

@@ -9,6 +9,7 @@ import os
 import matplotlib.gridspec as gridspec
 import matplotlib.ticker as mtick
 from matplotlib.backends.backend_pdf import PdfPages
+from mpl_toolkits.axes_grid.anchored_artists import AnchoredText
 
 
 def plot_layout(file_path, indicies):
@@ -53,6 +54,16 @@ def plot(pump_plt, index, data, header, time, units, plot_pos):
     pump_plt.set_ylim(y_data.min()*0.5, y_data.max()*1.5)
     pump_plt.set_xlim(time.min(), time.max())
     pump_plt.plot(time,y_data)
+    at = AnchoredText('Mean: ' + "{:.2f}".format(y_data.mean()) + ' ' + y_name
+                      + '\n' + 'Max:   ' + "{:.2f}".format(y_data.max()) + ' ' + y_name
+                      + '\n' + 'Min:    ' + "{:.2f}".format(y_data.min()) + ' ' + y_name
+                      + '\n' + 'Time:  ' + "{:.2f}".format(time.max()) + ' ' + 'Hours',
+                      prop=dict(size=8), frameon=True,
+                      loc=1
+                      )
+    #at.patch.set_boxstyle("round,pad=0.,rounding_size=0.2")
+    pump_plt.add_artist(at)
+
 
 def make_pdf(file_path):
     pp = PdfPages(file_path.replace('.csv','.pdf'))
@@ -61,4 +72,5 @@ def make_pdf(file_path):
 
 if __name__ == "__main__":
     
-    plot_layout('/home/pi/Data/CA1234/A1234/3250_RPM.csv', [7,8,10,12,13,15])
+    #plot_layout('/home/pi/Data/CA1234/A1234/3250_RPM.csv', [7,8,10,12,13,15])
+    plot_layout(r'C:\Users\gtetil\Downloads\4500_RPM.csv', [7, 8, 10, 12, 13, 15])
