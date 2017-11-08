@@ -5,8 +5,9 @@ import shutil
 import errno
 import pump_plot
 import numpy as np
+from PyPDF2 import PdfFileMerger
 
-#data_folder = 'C:\Users\gtetil\Documents\Projects\Data'
+#data_folder = 'C:\Users\gtetil\Downloads\Data'
 data_folder = '/home/pi/Data'
 sync_folder = os.path.join(data_folder, 'Sync')
 
@@ -56,13 +57,28 @@ def copy_sync_folders():
             os.mkdir(folder)
 
 def create_rel_time(path):
+    print path
     inc = 0.1 #this represent 0.1 S/s or 6 samples per hour
     data = np.genfromtxt(path, delimiter=',', dtype=str)
     size = data.shape[0] - 2 #subtract 2 because of header/units
-    print path
     time = np.linspace(0, (size-1)*inc, num=size)
     data[2:,0] = time
     np.savetxt(path, data, delimiter=',', fmt='%s')
+
+def pdf_cat(input_folder, serial_number):
+    merger = PdfFileMerger()
+    for (dirpath, dirnames, filenames) in os.walk(input_folder):
+        sorted_filenames = sorted(filenames)
+        for pdf in sorted_filenames:
+            try:
+                if pdf.split("_")[1] == 'RPM.pdf':
+                    merger.append(open(os.path.join(input_folder, pdf), 'rb'))
+                    os.remove(os.path.join(input_folder, pdf))
+            except:
+                pass
+    with open(os.path.join(input_folder, serial_number + '.pdf'), 'wb') as fout:
+        merger.write(fout)
+
 
 print 'starting'
 print datetime.datetime.now()
@@ -71,6 +87,17 @@ rel_paths = get_rel_file_paths()
 for path in rel_paths:
     sync_file(path)
 
-#create_rel_time(r'C:\Users\gtetil\Downloads\5600_RPM.csv')
+# Create PDF summmary files
+ca_folders = os.listdir(data_folder)
+for ca_folder in ca_folders:
+    if ca_folder != 'Sync':
+        ca_path = os.path.join(data_folder, ca_folder)
+        sn_folders = os.listdir(ca_path)
+        for sn_folder in sn_folders:
+            serial_number = sn_folder
+            sn_path = os.path.join(ca_path, sn_folder)
+            pdf_cat(sn_path, serial_number)
+
+#create_rel_time(r'C:\Users\gtetil\Downloads\5950_RPM.csv')
 
 
