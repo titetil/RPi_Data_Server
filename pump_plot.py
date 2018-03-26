@@ -76,4 +76,4 @@ def make_pdf(file_path):
 if __name__ == "__main__":
     
     #plot_layout('/home/pi/Data/CA1234/A1234/3250_RPM.csv', [7,8,10,12,13,15])
-    plot_layout(r'C:\Users\gtetil\Downloads\8500_RPM.csv', [7, 8, 10, 12, 13, 15])
+    plot_layout(r'C:\Users\gtetil\Downloads\Data\CA2017-2327\268781\8500_RPM.csv', [7, 8, 10, 12, 13, 15])
